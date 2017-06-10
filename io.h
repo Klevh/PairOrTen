@@ -1,6 +1,8 @@
 #ifndef _PAIRORTEN_IO_KLEVH_
 #define _PAIRORTEN_IO_KLEVH_
 
+#include <string.h>
+
 #include "SANDAL2/SANDAL2.h"
 #include "jeu.h"
 
@@ -11,6 +13,7 @@ typedef struct{
   int * board;
   int selected[2];
   ElementSDL2 * e_sel[2];
+  int end;
 }board_t;
 
 typedef struct number_data{

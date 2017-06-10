@@ -1,13 +1,33 @@
 #include "io.h"
 
 void validate(ElementSDL2 * this, SDL_Keycode kc){
-  board_t * board;
+  board_t     * board;
+  ElementSDL2 * e;
 
-  if(kc==13 && !getDataElementSDL2(this,(void**)&board)){
-    if(board && board->selected[0]!=-1 && board->selected[1]!=-1){
-      modify(board->board,board->selected[0]%WIDTH,board->selected[0]/WIDTH,board->selected[1]%WIDTH,board->selected[1]/WIDTH);
-      onclick_figure(board->e_sel[0]);
-      onclick_figure(board->e_sel[1]);
+  if(!getDataElementSDL2(this,(void**)&board)){
+    if(initIteratorElementSDL2(this)){
+      switch(kc){
+      case 27:
+	
+	break;
+      case 13:
+	e=nextIteratorElementSDL2(this);
+	delElementToElementSDL2(this,e);
+	removeElementSDL2(e);
+	generate(board->board);
+	board->end=0;
+	update_figure(board->e_sel[0]);
+	update_figure(board->e_sel[1]);
+	break;
+      }
+    }else{
+      if(kc==13){
+	if(board && board->selected[0]!=-1 && board->selected[1]!=-1){
+	  modify(board->board,board->selected[0]%WIDTH,board->selected[0]/WIDTH,board->selected[1]%WIDTH,board->selected[1]/WIDTH);
+	  onclick_figure(board->e_sel[0]);
+	  onclick_figure(board->e_sel[1]);
+	}
+      }
     }
   }
 }
@@ -69,12 +89,13 @@ void onclick_figure(ElementSDL2 * this){
 void game(){
   /* Graphical display variables */
   ElementSDL2 * e;
+  ElementSDL2 * controler;
   /* Game variables */
   board_t     * board; /* game's board */
   int           run; /* flag to end the game */
   int           tps, ticks, delay; /* settings variables for 60 frames/seconds */
   int           i,j; /* iterators */
-  char          s[2]="0"; /* string for figures */
+  char          s[10]="0"; /* string for figures */
   number_data * figure_info; /* informations for figures */
   /* colors */
   int           noir[]={0,0,0,0};
@@ -94,6 +115,7 @@ void game(){
   }
   board->selected[0] = -1;
   board->selected[1] = -1;
+  board->end=0;
   board->e_sel[0]=NULL;
   board->e_sel[1]=NULL;
 
@@ -115,19 +137,6 @@ void game(){
   }
 
   /* ---- game phase initialisation ---- */
-  /* element used to controle the physical board */
-  e=createBlock(0,0,1,1,noir,1,32);
-  if(!e){
-    puts("Erreur : un element du jeu n'a pas put etre cree par manque de memoire.");
-    free(board->board);
-    free(board);
-    closeAllWindowSDL2();
-    closeAllSDL2();
-    exit(-1);
-  }
-  setDataElementSDL2(e,board);
-  setKeyPressElementSDL2(e,validate);
-  
   /* graphical board generation */
   for(j=0;j<HEIGHT;j++){
     for(i=0;i<WIDTH;i++){
@@ -157,16 +166,40 @@ void game(){
       setDataElementSDL2(e,figure_info);
     }
   }
+  
+  /* element used to controle the physical board */
+  controler=createBlock(0,0,1,1,noir,1,32);
+  if(!controler){
+    puts("Erreur : un element du jeu n'a pas put etre cree par manque de memoire.");
+    free(board->board);
+    free(board);
+    closeAllWindowSDL2();
+    closeAllSDL2();
+    exit(-1);
+  }
+  setDataElementSDL2(controler,board);
+  setKeyPressElementSDL2(controler,validate);
 
   /* boucle principale */
   run = 1;
-  while(run>0){
+  while(run){
     tps = SDL_GetTicks();
     run=!PollEventSDL2(NULL);
-    if(lost(board->board)){
-      run = -1;
-    }else if(win(board->board)){
-      run = -2;
+    if(!board->end){
+      if(lost(board->board)){
+	run = -1;
+	board->end = 1;
+	strcpy(s,"You lost.");
+      }else if(win(board->board)){
+	run = -2;
+	board->end=1;
+	strcpy(s,"You won !");
+      }
+    }
+    if(run<0){
+      e=createTexte(.3f*WIN_WIDTH,.8f*WIN_HEIGHT,.4f*WIN_WIDTH,.15f*WIN_HEIGHT,"arial.ttf",s,blanc,SANDAL2_BLENDED,1,1);
+      addElementToElementSDL2(controler,e);
+      run = 1;
     }
 
     updateWindowSDL2();
@@ -180,15 +213,6 @@ void game(){
       delay=-ticks;
     }
   }
-
-  if(run == -2){
-    puts("You won !");
-  }else if(run == -1){
-    puts("You lose ...");
-  }
-  i=0;
-  while(i<WIDTH*HEIGHT && board->board[i++]);
-  printf("Your score is %d/%d\n",WIDTH*HEIGHT-i,WIDTH*HEIGHT);
 
   free(board->board);
   closeAllWindowSDL2();
