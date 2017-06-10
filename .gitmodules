@@ -1,0 +1,3 @@
+[submodule "SANDAL2"]
+	path = SANDAL2
+	url = git@github.com:Klevh/SANDAL2.git
