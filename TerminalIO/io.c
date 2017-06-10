@@ -1,7 +1,7 @@
 #include "io.h"
 
 void game(){
-  int  * board = generate();
+  int  * board = generate(NULL);
   char   c1[2];
   char   c2[2];
   int    error;

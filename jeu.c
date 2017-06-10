@@ -24,10 +24,12 @@ int modify(int * board,int x1,int y1,int x2,int y2){
 
 
 
-int * generate(){
-  int * board = malloc(HEIGHT*WIDTH*sizeof(*board));
-  int   i;
-  
+int * generate(int * board){
+  int i;
+
+  if(!board){
+    board=malloc(HEIGHT*WIDTH*sizeof(*board));
+  }
   srand(time(0));
 
   for(i=0;i<HEIGHT*WIDTH;++i){
