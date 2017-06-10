@@ -9,14 +9,21 @@
 
 typedef struct{
   int * board;
-  int hasChanged;
   int selected[2];
+  ElementSDL2 * e_sel[2];
 }board_t;
 
 typedef struct number_data{
   board_t * board;
+  char c;
   int id;
 }number_data;
+
+void validate(ElementSDL2 * this,SDL_Keycode kc);
+
+void update_figure(ElementSDL2 * this);
+
+void onclick_figure(ElementSDL2 * this);
 
 void game();
 

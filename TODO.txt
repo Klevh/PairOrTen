@@ -1,0 +1,10 @@
+Add a menu
+    - settings (colors for example)
+    - rules
+    - scores (add a timer for example)
+
+In game
+   - allow more than one game
+   - ESC to quit
+
+Correct error messages (put them all in english)
