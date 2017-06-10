@@ -7,9 +7,6 @@ void validate(ElementSDL2 * this, SDL_Keycode kc){
   if(!getDataElementSDL2(this,(void**)&board)){
     if(initIteratorElementSDL2(this)){
       switch(kc){
-      case 27:
-	
-	break;
       case 13:
 	e=nextIteratorElementSDL2(this);
 	delElementToElementSDL2(this,e);
