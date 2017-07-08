@@ -23,9 +23,11 @@ int modify(int * board,int x1,int y1,int x2,int y2){
 }
 
 
-
+#include <stdio.h>
 int * generate(int * board){
-  int i;
+  int i,j;
+  int count[5]={0};
+  int old = 5;
 
   if(!board){
     board=malloc(HEIGHT*WIDTH*sizeof(*board));
@@ -34,6 +36,29 @@ int * generate(int * board){
 
   for(i=0;i<HEIGHT*WIDTH;++i){
     board[i]=rand()%9+1;
+    if(board[i]>5){
+      ++count[9-board[i]];
+    }else{
+      ++count[board[i]-1];
+    }
+  }
+
+  for(i=0;i<5;++i){
+    if(count[i]%2){
+      if(old == 5){
+	old = i;
+      }else{
+	j = 0;
+	while(j<HEIGHT*WIDTH && board[j]!=old && board[j]!=9-old){
+	  ++j;
+	}
+	if(j<HEIGHT*WIDTH){
+	  board[j]=(rand()%2?9-i:i);
+	}else{
+	  old = i;
+	}
+      }
+    }
   }
   
   return board;
